@@ -75,8 +75,8 @@ var crypto_1 = __importDefault(require("crypto"));
 var generateText_1 = require("./generateText");
 var color_1 = __importDefault(require("color"));
 var logoSVG = fs.readFileSync(path.join(__dirname, './assets/logo.svg'));
-var stopWatchSVG = fs.readFileSync(path.join(__dirname, './assets/stopwatch/stopwatch.svg'));
-var plusSVG = fs.readFileSync(path.join(__dirname, './assets/stopwatch/plus.svg'));
+var stopWatchSVG = fs.readFileSync(path.join(__dirname, './assets/stopwatch.svg'));
+var plusSVG = fs.readFileSync(path.join(__dirname, './assets/plus.svg'));
 var waveSVG = fs.readFileSync(path.join(__dirname, './assets/wave.svg'));
 var THUMBNAIL_OPTS = {
     width: 850,
@@ -89,19 +89,20 @@ var LOGO_OPTS = {
     offsetLeft: 10,
 };
 var buildThumbnail = function (articleTitle, backgroundImage) { return __awaiter(void 0, void 0, void 0, function () {
-    var outputDir, overlayColor, articleTitleHash, outputFile, textToLines, logo, stopwatch, wave, plus, background, overlay, createOps, flat, e_1;
+    var outputDir, overlayColor, articleTitleHash, shortPath, fullPath, textToLines, logo, stopwatch, wave, plus, background, overlay, createOps, flat, e_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                outputDir = path.join(__dirname, '../out');
+                outputDir = path.join(process.cwd(), './public/article-thumbnails');
                 overlayColor = (0, color_1.default)(THUMBNAIL_OPTS.overlayColor);
-                if (!fs.existsSync(outputDir)) {
-                    console.info('Creating output directory');
-                    fs.mkdirSync(outputDir);
+                if (fs.existsSync(outputDir)) {
+                    fs.rmdirSync(outputDir, { recursive: true });
                 }
+                fs.mkdirSync(outputDir);
                 console.info("Generating thumbnail for \"" + articleTitle + "\"");
                 articleTitleHash = crypto_1.default.createHash('md5').update(articleTitle).digest('hex');
-                outputFile = path.join(outputDir, './article-thumbnail-' + articleTitleHash + '.png');
+                shortPath = articleTitleHash + ".png";
+                fullPath = path.join(outputDir, shortPath);
                 return [4 /*yield*/, (0, generateText_1.createLines)(articleTitle, THUMBNAIL_OPTS)];
             case 1:
                 textToLines = _a.sent();
@@ -232,15 +233,24 @@ var buildThumbnail = function (articleTitle, backgroundImage) { return __awaiter
                         width: THUMBNAIL_OPTS.width,
                         height: THUMBNAIL_OPTS.height
                     })
-                        .toFile(outputFile)];
+                        .toFile(fullPath)];
             case 11:
                 _a.sent();
-                console.info("Thumbnail created \"" + outputFile + "\"");
-                return [3 /*break*/, 13];
+                console.info("Thumbnail created \"" + fullPath + "\"");
+                return [2 /*return*/, {
+                        error: null,
+                        output: {
+                            fullPath: fullPath,
+                            shortPath: shortPath
+                        }
+                    }];
             case 12:
                 e_1 = _a.sent();
                 console.error(e_1);
-                return [3 /*break*/, 13];
+                return [2 /*return*/, {
+                        error: e_1.message,
+                        output: null
+                    }];
             case 13: return [2 /*return*/];
         }
     });

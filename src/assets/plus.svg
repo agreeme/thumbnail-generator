@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="51px" height="51px" viewBox="0 0 51 51" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group 10</title>
+    <defs>
+        <polygon id="path-1" points="22.0237 0.894 50.5185 22.21618 29.1963 50.71096 0.7015 29.38882"></polygon>
+    </defs>
+    <g id="Website" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard-Copy-25" transform="translate(-125.000000, -420.000000)">
+            <g id="Group-10" transform="translate(125.000000, 420.000000)">
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <g id="Clip-9"></g>
+                <polygon id="Fill-8" fill="white" mask="url(#mask-2)" points="19.1801 6.3632 26.2946 5.3389 28.6551 21.73307 45.0492 19.37264 46.0736 26.48715 29.6794 28.84758 32.0399 45.24175 24.9253 46.2661 22.5649 29.87193 6.1707 32.23237 5.1464 25.11785 21.5406 22.75742"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -37,7 +37,7 @@ const generateText = async (articleTitle: string) => {
     .resize({ height: SVG_TEXT_OPTS.svgHeight, fit: 'contain' })
     .toBuffer({ resolveWithObject: true })
 
-  return await sharp(
+  return sharp(
       {
         create: {
           channels: 4,
@@ -61,7 +61,10 @@ const generateText = async (articleTitle: string) => {
 
 const textWithBackground = async (articleTitle: string) => {
   const lines = sentenceToLines(articleTitle, SVG_TEXT_OPTS.wordsPerLine)
-  const toRender = lines.map(line => generateText(line))
+  const toRender = lines.map(async (line) => {
+    const rendered = await generateText(line)
+    return rendered
+  })
   return await Promise.all(toRender)
 }
 

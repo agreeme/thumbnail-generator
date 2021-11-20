@@ -1,15 +1,16 @@
 {
   "name": "website-thumbnail-generator",
-  "version": "1.0.0",
-  "description": "",
-  "main": "build/src/index.js",
+  "version": "1.0.7",
+  "description": "Allows to easily generate thumbnails for the articles posted on agreeme.app",
+  "main": "build/index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "prepublish": "npm run copy-files && npm run build",
+    "copy-files": "mkdir -p ./build/assets/ && cp -r ./src/assets/ ./build/assets/."
   },
   "keywords": [
     "thumbnail"
   ],
-  "author": "Olivier Bacs <oli@agreeme.app>",
   "dependencies": {
     "@fontsource/poppins": "^4.5.0",
     "color": "^4.0.1",
@@ -22,5 +23,10 @@
     "@types/sharp": "^0.29.3",
     "@types/text-to-svg": "^3.1.1",
     "ts-node": "^10.4.0"
+  },
+  "browser": {
+    "sharp": false,
+    "crypto": false,
+    "util": false
   }
 }

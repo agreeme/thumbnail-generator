@@ -79,7 +79,7 @@ var generateText = function (articleTitle) { return __awaiter(void 0, void 0, vo
                         .toBuffer({ resolveWithObject: true })];
             case 1:
                 svgTextSharp = _a.sent();
-                return [4 /*yield*/, (0, sharp_1.default)({
+                return [2 /*return*/, (0, sharp_1.default)({
                         create: {
                             channels: 4,
                             height: svgTextSharp.info.height + SVG_TEXT_OPTS.backgroundPadding.vertical,
@@ -97,7 +97,6 @@ var generateText = function (articleTitle) { return __awaiter(void 0, void 0, vo
                         }])
                         .png()
                         .toBuffer({ resolveWithObject: true })];
-            case 2: return [2 /*return*/, _a.sent()];
         }
     });
 }); };
@@ -108,7 +107,17 @@ var textWithBackground = function (articleTitle) { return __awaiter(void 0, void
         switch (_a.label) {
             case 0:
                 lines = (0, textOps_1.sentenceToLines)(articleTitle, SVG_TEXT_OPTS.wordsPerLine);
-                toRender = lines.map(function (line) { return generateText(line); });
+                toRender = lines.map(function (line) { return __awaiter(void 0, void 0, void 0, function () {
+                    var rendered;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, generateText(line)];
+                            case 1:
+                                rendered = _a.sent();
+                                return [2 /*return*/, rendered];
+                        }
+                    });
+                }); });
                 return [4 /*yield*/, Promise.all(toRender)];
             case 1: return [2 /*return*/, _a.sent()];
         }

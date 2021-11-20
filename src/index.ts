@@ -6,8 +6,8 @@ import { createLines } from './generateText';
 import Color from 'color'
 
 const logoSVG = fs.readFileSync(path.join(__dirname, './assets/logo.svg'))
-const stopWatchSVG = fs.readFileSync(path.join(__dirname, './assets/stopwatch/stopwatch.svg'))
-const plusSVG = fs.readFileSync(path.join(__dirname, './assets/stopwatch/plus.svg'))
+const stopWatchSVG = fs.readFileSync(path.join(__dirname, './assets/stopwatch.svg'))
+const plusSVG = fs.readFileSync(path.join(__dirname, './assets/plus.svg'))
 const waveSVG = fs.readFileSync(path.join(__dirname, './assets/wave.svg'))
 
 type SharpInput = Buffer
@@ -25,7 +25,7 @@ type SharpInput = Buffer
 const THUMBNAIL_OPTS = {
   width: 850,
   height: 560,
-  overlayColor :'#f0f7ff'
+  overlayColor: '#f0f7ff'
 };
 
 const LOGO_OPTS = {
@@ -34,20 +34,32 @@ const LOGO_OPTS = {
   offsetLeft: 10,
 }
 
+type OutputSuccess = {
+  fullPath: string,
+  shortPath: string
+}
 
-const buildThumbnail = async (articleTitle: string, backgroundImage: SharpInput) => {
-  const outputDir = path.join(__dirname, '../out')
+type OutputType = null | OutputSuccess
+
+type BuildThumbnailReturn = {
+  error: null | string
+  output: OutputType
+}
+
+const buildThumbnail = async (articleTitle: string, backgroundImage: SharpInput): Promise<BuildThumbnailReturn> => {
+  const outputDir = path.join(process.cwd(), './public/article-thumbnails')
   const overlayColor = Color(THUMBNAIL_OPTS.overlayColor);
 
-  if (!fs.existsSync(outputDir)) {
-    console.info('Creating output directory')
-    fs.mkdirSync(outputDir)
+  if (fs.existsSync(outputDir)) {
+    fs.rmdirSync(outputDir, { recursive: true })
   }
 
+  fs.mkdirSync(outputDir)
   console.info(`Generating thumbnail for "${articleTitle}"`)
 
   const articleTitleHash = crypto.createHash('md5').update(articleTitle).digest('hex')
-  const outputFile = path.join(outputDir, './article-thumbnail-' + articleTitleHash + '.png')
+  const shortPath = `${articleTitleHash}.png`
+  const fullPath = path.join(outputDir, shortPath)
   const textToLines = await createLines(articleTitle, THUMBNAIL_OPTS)
 
   try {
@@ -57,7 +69,7 @@ const buildThumbnail = async (articleTitle: string, backgroundImage: SharpInput)
         fit: 'contain'
       })
       .trim()
-      .toBuffer({ resolveWithObject: true})
+      .toBuffer({ resolveWithObject: true })
 
     const stopwatch = await sharp(stopWatchSVG)
       .resize({
@@ -83,12 +95,12 @@ const buildThumbnail = async (articleTitle: string, backgroundImage: SharpInput)
       .trim()
       .toBuffer({ resolveWithObject: true })
 
-      const background = await sharp(backgroundImage)
-        .resize({
-          width: THUMBNAIL_OPTS.width,
-          height: THUMBNAIL_OPTS.height,
-        })
-        .toBuffer()
+    const background = await sharp(backgroundImage)
+      .resize({
+        width: THUMBNAIL_OPTS.width,
+        height: THUMBNAIL_OPTS.height,
+      })
+      .toBuffer()
 
     const overlay = await sharp({
       create: {
@@ -103,13 +115,13 @@ const buildThumbnail = async (articleTitle: string, backgroundImage: SharpInput)
         }
       }
     })
-    .png()
-    .resize({
-      width: THUMBNAIL_OPTS.width,
-      height: THUMBNAIL_OPTS.height,
-      fit: 'cover'
-    })
-    .toBuffer()
+      .png()
+      .resize({
+        width: THUMBNAIL_OPTS.width,
+        height: THUMBNAIL_OPTS.height,
+        fit: 'cover'
+      })
+      .toBuffer()
 
     const createOps = await sharp({
       create: {
@@ -123,8 +135,8 @@ const buildThumbnail = async (articleTitle: string, backgroundImage: SharpInput)
         }
       }
     })
-    .png()
-    .toBuffer()
+      .png()
+      .toBuffer()
 
     const flat = await sharp(createOps)
       .composite([
@@ -163,16 +175,32 @@ const buildThumbnail = async (articleTitle: string, backgroundImage: SharpInput)
       .png()
       .toBuffer()
 
-   await sharp(flat)
-     .resize({
-       width: THUMBNAIL_OPTS.width,
-       height: THUMBNAIL_OPTS.height
-    })
-    .toFile(outputFile)
-    console.info(`Thumbnail created "${outputFile}"`)
-  } catch (e) {
+    await sharp(flat)
+      .resize({
+        width: THUMBNAIL_OPTS.width,
+        height: THUMBNAIL_OPTS.height
+      })
+      .toFile(fullPath)
+    console.info(`Thumbnail created "${fullPath}"`)
+    return {
+      error: null,
+      output: {
+        fullPath,
+        shortPath
+      }
+    }
+  } catch (e: any) {
     console.error(e)
+    return {
+      error: e.message,
+      output: null
+    }
   }
 }
 
-export { buildThumbnail}
+export {
+  buildThumbnail,
+  OutputSuccess,
+  OutputType,
+  BuildThumbnailReturn
+}
